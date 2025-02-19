@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     portaudio19-dev \
     python3-dev \
-    libsndfile1-dev
+    libsndfile1-dev \
+    python3-distutils
 # Create Work directory
 WORKDIR /app
 
