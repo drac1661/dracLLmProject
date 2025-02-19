@@ -48,39 +48,48 @@ task_mapping = {
     # Add Phase B task mappings here
 }
 
-#validate input path
-def validate_input_path(path: str):
-    """Ensure the input path exists and is inside data."""
-    abs_path = os.path.abspath(path)
-    
-    if not abs_path.startswith(os.path.abspath(DATA_DIR)):
-        raise HTTPException(status_code=400, detail="Access to paths outside data is restricted")
-    
-    if os.path.exists(abs_path) and os.path.basename(abs_path).lower() in ["rm", "delete"]:
-        raise HTTPException(status_code=400, detail="File deletion is not allowed")
-    
-    if not os.path.exists(abs_path):
-        raise HTTPException(status_code=400, detail=f"Input file does not exist: {path}")
-
-    if os.path.isdir(abs_path):
-        raise HTTPException(status_code=400, detail="Access to directories is restricted")
-
-
-
-#validate output path
 def validate_output_path(path: str):
-    """Ensure the output path is inside data but does not need to exist."""
+    """Ensure the output path is inside /data and does not need to exist."""
     abs_path = os.path.abspath(path)
- 
-    if os.path.exists(abs_path) and os.path.basename(abs_path).lower() in ["rm", "delete"]:
+
+    # Restrict access to only files and folders inside /data
+    if not abs_path.startswith(os.path.abspath(DATA_DIR) + os.sep):
+        raise HTTPException(status_code=400, detail="Access to paths outside /data is restricted")
+
+    # Prevent deletion attempts
+    if os.path.basename(abs_path).lower() in ["rm", "delete"]:
         raise HTTPException(status_code=400, detail="File deletion is not allowed")
-    
-    if not abs_path.startswith(os.path.abspath(DATA_DIR)):
-        raise HTTPException(status_code=400, detail="Access to paths outside data is restricted")
-    
+
+    # Ensure the output directory exists
     output_dir = os.path.dirname(abs_path)
     if not os.path.exists(output_dir):
         raise HTTPException(status_code=400, detail=f"Output directory does not exist: {output_dir}")
+
+
+#validate output path
+def validate_input_path(path: str):
+    """Ensure the input path exists and is inside /data."""
+    abs_path = os.path.abspath(path)
+
+    # Restrict access to only files and folders inside /data
+    if not abs_path.startswith(os.path.abspath(DATA_DIR) + os.sep):
+        raise HTTPException(status_code=400, detail="Access to paths outside /data is restricted")
+
+    # Prevent deletion attempts
+    if os.path.basename(abs_path).lower() in ["rm", "delete"]:
+        raise HTTPException(status_code=400, detail="File deletion is not allowed")
+
+    # Ensure the file or directory exists
+    if not os.path.exists(abs_path):
+        raise HTTPException(status_code=400, detail=f"Input path does not exist: {path}")
+
+    # Allow access to nested files and folders but restrict access to parent directories
+    if os.path.isdir(abs_path):
+        return  # Allow directory access inside /data
+
+    # Ensure it's a valid file inside /data
+    if not os.path.isfile(abs_path):
+        raise HTTPException(status_code=400, detail="Invalid file path")
 
 
 def call_llm(prompt):

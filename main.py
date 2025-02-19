@@ -59,16 +59,21 @@ task_mapping = {
 def validate_input_path(path: str):
     """Ensure the input path exists and is inside data."""
     abs_path = os.path.abspath(path)
-    
-    if not abs_path.startswith(os.path.abspath(DATA_DIR)):
+    data_dir_abs = os.path.abspath(DATA_DIR)
+
+    # Check if the path is outside the DATA_DIR
+    if not abs_path.startswith(data_dir_abs):
         raise HTTPException(status_code=400, detail="Access to paths outside data is restricted")
-    
+
+    # Check if the path is a file deletion attempt
     if os.path.exists(abs_path) and os.path.basename(abs_path).lower() in ["rm", "delete"]:
         raise HTTPException(status_code=400, detail="File deletion is not allowed")
-    
+
+    # Check if the file exists
     if not os.path.exists(abs_path):
         raise HTTPException(status_code=400, detail=f"Input file does not exist: {path}")
 
+    # Check if the path is a directory and raise an error if it is
     if os.path.isdir(abs_path):
         raise HTTPException(status_code=400, detail="Access to directories is restricted")
 
@@ -166,7 +171,7 @@ def run_task(task: str = Query(..., description="Plain English task description"
             if 'input_file' in params:
                 validate_input_path(params["input_file"])   
             if 'output_file' in params:
-                validate_output_path(params["output_file"])
+                validate_input_path(params["output_file"])
                 
             print(params)
             result = func(**params)
@@ -189,6 +194,9 @@ def run_task(task: str = Query(..., description="Plain English task description"
 def read_file(path: str = Query(..., description="File path")):
     """Reads and returns the content of the specified file."""
     # validate_path(path)
+    path='.'+path
+    if (path):
+        validate_output_path(path)
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     with open(path, "r") as f:

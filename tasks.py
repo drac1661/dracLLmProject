@@ -234,7 +234,7 @@ def image_to_textbase64(base64_image,prompt):
         "content": [
             {
             "type": "text",
-            "text": "give number of person holding stick in the image give only number"
+            "text": prompt
             },
             {
             "type": "image_url",
@@ -258,7 +258,7 @@ def image_to_textbase64(base64_image,prompt):
 def extract_credit_card(input_file, output_file):
     image_path = input_file
     base64_image = encode_image(image_path)
-    prompt="give only the card number without space"
+    prompt="i gave you a image extract 16 digit number from it without space and don't add any text in it give only 16 digit number as an output"
     card_number=image_to_textbase64(base64_image,prompt)
     with open(output_file,'w') as f:
        f.write(card_number)
@@ -279,13 +279,13 @@ api_key = os.getenv("AIPROXY_TOKEN") # Set your OpenAI API key
 # Step 2: Generate embeddings for comments using requests
 def get_embedding(text):
     print("a")
-    url = host
+    url = "https://aiproxy.sanand.workers.dev/openai/v1/embeddings"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     data = {
-        "model": "text-embedding-ada-002",
+        "model": "text-embedding-3-small",
         "input": text
     }
     
