@@ -18,7 +18,6 @@ pillow==10.4.0
 PyAudio==0.2.14
 pydantic==2.10.6
 pydantic-core==2.27.2
-pytesseract==0.3.13
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2025.1
