@@ -129,7 +129,7 @@ def call_llm(prompt):
     if response.status_code == 200:
         return response.json()
     else:
-        return f"Error: {response.status_code}, {response.text}"
+        return {"message":response.text}
     
 
 @app.post("/run")
@@ -138,6 +138,9 @@ def create_function(task: str = Query(..., description="Plain English task descr
         prompt=""" The file /data/dates.txt contains a list of dates, one per line. Count the number of Wednesdays in the list, and write just the number to /data/dates-wednesdays.txt"""
         prompt=task
         response=call_llm(prompt)
+        if "message" in response:
+            return  HTTPException(status_code=500, detail="Invalid JSON response from LLM")
+            
         data=response['choices'][0]['message']['content']
         data=data.strip('```json').strip('```').strip()
         print(data)
@@ -180,11 +183,11 @@ def create_function(task: str = Query(..., description="Plain English task descr
                 results.append({task_name: result})
                 print(result)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Invalid JSON response from LLM")
+        raise HTTPException(status_code=400, detail="Invalid JSON response from LLM")
     except HTTPException as he:
         raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 
@@ -192,11 +195,18 @@ def create_function(task: str = Query(..., description="Plain English task descr
 def read_file(path: str = Query(..., description="File path")):
     """Reads and returns the content of the specified file."""
     # validate_path(path)
-    if not os.path.exists(path):
-        raise HTTPException(status_code=404, detail="File not found")
-    with open(path, "r") as f:
-        content=f.read()
-    return content
+    try:
+        path='.'+path
+        validate_input_path(path)
+
+        if not os.path.exists(path):
+            raise HTTPException(status_code=404, detail="File not found")
+        with open(path, "r") as f:
+            content=f.read()
+        return content
+    except Exception as e:
+        return e
+
 
 
     
