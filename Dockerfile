@@ -1,9 +1,12 @@
 # start by pulling the ubuntu image
 FROM python:3.12.8
 
-# installed default Apps
-RUN apt-get update && apt-get install -y apt-utils vim unixodbc ffmpeg libsm6 libxext6 unixodbc-dev build-essential libpoppler-cpp-dev python-dev python3-dev
-
+# Install required dependencies for building PyAudio
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    portaudio19-dev \
+    python3-dev \
+    libsndfile1-dev
 # Create Work directory
 WORKDIR /app
 
