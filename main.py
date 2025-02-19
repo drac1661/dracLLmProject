@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 DATA_DIR = "data"
-api_key= os.getenv("api_key")
+api_key= os.getenv("AIPROXY_TOKEN")
 host = os.getenv("host")  # Replace with actual LLM endpoint
 
 # Task mapping

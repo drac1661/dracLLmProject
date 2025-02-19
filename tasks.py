@@ -17,7 +17,7 @@ import json
 import requests
 
 host=os.getenv("host")
-api_key=os.getenv("api_Key")
+api_key=os.getenv("AIPROXY_TOKEN")
 
 
 # A1 - Install uv and run datagen.py
@@ -271,7 +271,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import os
 
 # OpenAI API Key
-api_key = os.getenv("api_key") # Set your OpenAI API key
+api_key = os.getenv("AIPROXY_TOKEN") # Set your OpenAI API key
 
 # Step 1: Read comments from file
 
